@@ -1,0 +1,405 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/*  Text - FF5959  ornage- FF5959 prple - 9010FF*/
+
+
+
+html{
+  scroll-behavior: smooth;
+}
+
+body {
+  background:#181825;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+ul li{
+  list-style: none;
+}
+
+/* Logo Font Styles */
+
+.font-title {
+  font-family: Montserrat;
+  font-weight: bolder;
+}
+
+
+
+/*
+For LogoutBUtton
+*/
+@media only screen and (max-width: 767px) {
+  .logoutbtn{
+    display: none;
+  }
+}
+
+
+/* Adding css for scrollbars */
+
+/* For Browser that supports webkit */
+
+::-webkit-scrollbar{
+  width : 0.8em;
+  border-radius: 0.2rem;
+}
+::-webkit-scrollbar-track {
+  background-color: #ccc;
+  /* margin-top: 3.5rem ; */
+}
+::-webkit-scrollbar-thumb {
+  background-color: #8986ad;
+}
+
+@supports (scrollbar-color: #ccc #8986ad ){
+  *{
+    scrollbar-color: #ccc #8986ad;
+    scrollbar-width: 0.8rem;
+    border-radius: 0.2rem;
+  }
+}
+
+
+
+/* Footer css start */
+
+.footer{
+  background-color: rgb(0, 0, 0);
+  
+}
+
+
+/* Footer css end */
+.footer{
+  background-color: #101925;
+}
+
+/* Navbar start  */
+.Navbar{
+  background-color:#101925;
+  z-index: 1;
+
+}
+
+.nav-item{
+  color: #9010FF;
+  font-weight: 1200;
+}
+
+/* Navbar end */
+
+
+
+.green-gradient {
+  background: rgba(126, 231, 135, 0.54);
+  filter: blur(138.5px);
+  width: 234px;
+  height: 234px;
+}
+
+.nav_gradient {
+  background: linear-gradient(
+    152.97deg,
+    rgb(255, 255, 255) 0% rgba(255, 255, 255, 0) 100%
+  );
+  backdrop-filter: blur(20px);
+}
+
+
+
+
+
+/* 
+
+
+*/
+
+
+
+
+
+.add-conatiner {
+  /* padding-left: 122px; */
+  background-color: white;
+  width: 500px;
+  padding: 25px;
+  /* margin-left: 382px; */
+  /* margin:50px auto 0; */
+  border-top: 5px solid blue;
+  box-shadow: 0 0 7px 5px rgba(0, 0, 0, 0.5);
+}
+
+.add-conatiner h2 {
+  font-size: 22px;
+  line-height: 22px;
+  padding: 30px;
+  text-align: center;
+}
+
+.name2 {
+  margin-top: 5.9px;
+  /* padding: 5px; */
+  width: 100%;
+}
+
+.inpiut-name {
+  width: 90%;
+  position: relative;
+  margin: 20px auto;
+}
+
+.name {
+  width: 45%;
+  padding: 8px 0 8px 40px;
+}
+
+.inpiut-name span {
+  margin-left: 35px;
+}
+
+.text-name {
+  width: 100%;
+  padding: 8px 0 8px 40px;
+}
+
+.button {
+  font-weight: bold;
+  /* margin: 12px; */
+  font-size: 22px;
+  color: white;
+  padding: 8px 0 8px 0px;
+  /* background-color: hsl(231, 91%, 51%); */
+  width: 100%;
+}
+
+.loading {
+  width: 100vh;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Spinner {
+  width: 100vh;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bnt {
+  padding: 8px;
+  text-align: center;
+  width: 100%;
+  background-color: #00b712;
+  background-image:
+    linear-gradient(180deg, #00b712 0%, #5aff15 80%);
+  border: none;
+  cursor: pointer;
+  font-family: 'Roboto';
+  text-transform: uppercase;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+::-webkit-scrollbar {
+  width: 0.8em;
+  border-radius: 0.2rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #000000;
+  /* margin-top: 3.5rem ; */
+}
+
+::-webkit-scrollbar-thumb {
+  background:linear-gradient(to top,blue 10%,rgba(227, 6, 205, 0.56)70%,transparent); 
+}
+
+
+@supports (scrollbar-color: #ccc #8986ad) {
+  * {
+    scrollbar-color: #ccc #8986ad;
+    scrollbar-width: 0.8rem;
+    border-radius: 0.2rem;
+  }
+}
+
+
+
+
+.HeaderNavWrapper{
+
+display: flex;
+align-items: center;
+margin-left: 12px;
+background-color: blue;
+padding: 6px;
+height: 50%;
+border-radius: 10px;
+font-size: 22px;
+padding-top: 12px;
+
+}
+
+  .HeaderNavLinks{
+display: flex;
+padding-top: 12px;
+font-size: large;
+align-items: center;
+
+background-color:#00b712;
+
+font-family: 'Roboto';
+margin: 5px;
+border-radius: 10px;
+padding: 0 5px 0 5px;
+cursor: pointer;
+text-transform: uppercase;
+font-weight: bold;
+font-size: small;
+  }
+
+
+  /* Review  */
+
+  .cnt{
+    background: linear-gradient(135deg, #690A4A, #59194A, #49274A, #39364B, #28454B, #18534B, #08624B);
+  }
+  .mn{
+    color: #ccc;
+  }
+
+  .subcnt{
+    padding: 2px;
+    margin-left: 171px;
+  }
+
+  .mncnt{
+    padding-left: 192px;
+    color: #5aff15;
+    font-size: 42px;
+  }
+
+
+  /* Styles for screens larger than 768px (e.g., tablets) */
+@media (min-width: 768px) {
+  .subcnt {
+    /* Add styles for larger screens here */
+    margin: 0 auto; /* Center the content horizontally */
+    width: 80%; /* Adjust the width to your preference */
+  }
+}
+
+/* Styles for screens larger than 1024px (e.g., desktops) */
+@media (min-width: 1024px) {
+  .subcnt {
+    /* Add styles for extra-large screens here */
+    width: 60%; /* Adjust the width to your preference */
+  }
+}
+
+
+.tb{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.tr{
+  flex: 1 1 auto;
+}
+
+
+/* for images and cards */
+
+/* .unmrk{
+  width: 1100px;
+  height:auto;
+
+} */
+
+.mrkt{
+
+  /* height: 20px; */
+  background: linear-gradient(135deg, #690A4A, #59194A, #49274A, #39364B, #28454B, #18534B, #08624B);
+
+}
+.ImgDiv{
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+}
+
+.MyDiv{
+  width: 417px;
+  height: 477px;
+
+  @media (max-width: 1450px) {
+    margin: 0 auto;
+  }
+}
+
+
+.MyDiv1{
+  width: 724px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 3rem;
+  }
+}
+
+
+/* navbar */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 90px;
+  padding: 0 1rem;
+  color: #fff;
+  background-color:#101925;
+  position: fixed;
+  z-index: 1;
+}
+
+.navbar.active {
+  background-color:#101925;
+}
+
+
+.Navbar{
+  
+  background-color:#101925;
+  z-index: 1;
+
+}
+
+.nav-item{
+  color: #9010FF;
+  font-weight: 1200;
+}
