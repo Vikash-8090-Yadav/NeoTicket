@@ -59,7 +59,7 @@ function Review() {
   }, []);
   // console.log(state);
   return (
-    <div className ="cnt" style={{ backgroundColor: "", height: "100%" }}>
+    <div className =" bg-gradient-to-r from-gray-700 to-yellow-300" style={{ backgroundColor: "", height: "100%" }}>
       {/* <img src={chai} className="img-fluid" alt=".." height={556} width={742} /> */}
       <div className="container">
         <Buy state={state} />

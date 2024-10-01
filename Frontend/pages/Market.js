@@ -25,7 +25,7 @@ function Market() {
       <Navbar/>
         <nav className={`${style.container} border-b p-10`}>
        
-          <p className="text-5xl py-12 text-white font-medium">Marketplace Hub</p>
+          <p className="text-5xl py-12 text-white font-medium">OneTicket Hub</p>
 
           {/* <div className="flex mt-4">
             <Link href="/">

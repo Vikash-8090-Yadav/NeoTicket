@@ -43,7 +43,7 @@ const Navbar = () => {
         <>
             <div className = {navBar ? 'navbar active' : 'navbar'}>
                 <h1 className = "text-3xl  ml-2 text-white font-semibold max-sm:text-xl max-sm:ml-0 max-sm:mr-3"><h2>
-            <span className="text-blue-800">EDUL</span><span className="text-white">EARN</span>
+            <span className="text-blue-800">MINIM</span><span className="text-white">AL</span>
           </h2></h1>
 
                 <ul className = "hidden md:flex text-white">

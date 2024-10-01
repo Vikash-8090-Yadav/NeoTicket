@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { ToastContainer, toast } from 'react-toastify';
 import { TailSpin } from "react-loader-spinner";
 import Navbar from "../Component/Course/Nav";
@@ -10,7 +9,8 @@ import axios from 'axios';
 import { upload } from "@spheron/browser-upload";
 import { notification } from 'antd';
 import { create as IPFSHTTPClient } from 'ipfs-http-client';
-
+import Image from "next/image";
+import basic from "../Component/v1.0.0/Cards/images/basic.jpg"
 const projectId = '2EFZSrxXvWgXDpOsDrr4cQosKcl';
 const ProjectSecret = 'b84c6cb2eec9c4536a0b6424ca709f9d';
 
@@ -101,10 +101,10 @@ const [LIghthouseCid,SetLIghthouseCid] = useState('');
     }
 
   
-    if (!name || !description || !price || !fileUrl) {
-      console.log("Error");
-      return;
-    }
+    // if (!name || !description || !price || !fileUrl) {
+    //   console.log("Error");
+    //   return;
+    // }
 
     console.log("Done");
  
@@ -226,34 +226,32 @@ const [LIghthouseCid,SetLIghthouseCid] = useState('');
   return (
     <>
     <Navbar/>
-      <div className="min-h-screen py-10 bg-gradient-to-r from-green-700 to-green-300">
+      <div className="min-h-screen py-10 bg-gradient-to-r from-gray-700 to-gray-300">
       
         <div className="container mx-auto mt-3">
           <div className="flex w-8/12 bg-white flex-col md:flex-row rounded-xl mx-auto shadow-lg overflow-hidden">
           <div className="md:w-1/2 bg-black flex flex-col justify-center items-center">
-            <h2 className='text-3xl mb-4 text-white'>Add your details</h2>
-            <div>
-              <p className='text-justify px-4 text-white'>Congratulations on taking the step to become a part of our vibrant community! By contributing your unique items to "EduLearn," you're not just listing products; you're creating opportunities for others to discover and own exceptional pieces. Your participation in our marketplace enriches the experience for all, fostering a dynamic environment for collectors and enthusiasts alike. Thank you for being an integral part of our growing network of passionate traders and buyers.</p>
-            </div>
+
+          <Image src = {basic} className = "w-full rounded-t-md duration-200 hover:scale-110 hover:overflow-hidden" />
           </div>
           <div className="md:w-1/2 py-10 px-12">
-            <p className="mb-3">List your Course and get paid.</p>
+            <p className="mb-3">List your event</p>
             <form>
               <div className="mt-5">
-                <input placeholder="Course Name" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, name: e.target.value })}/>
+                <input placeholder="Event Name" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, name: e.target.value })}/>
               </div>
 
               <div className="mt-5">
-                <textarea placeholder="Course Description" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, description: e.target.value })}/>  
+                <textarea placeholder="Event Description" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, description: e.target.value })}/>  
               </div>
               
               <div className="mt-5">
-                <input placeholder="Course Price in ETH" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, price: e.target.value })}/>  
+                <input placeholder="Event Price in ETH" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, price: e.target.value })}/>  
               </div>
               
               <div className="mt-5">
 							  <label className="block text-sm font-medium text-gray-700 name1">
-								  Select Course Image
+								  Select event Image
 							  </label>
 							  <div className="mt-1 flex items-center border-2 border-black">
 								  <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
@@ -276,7 +274,7 @@ const [LIghthouseCid,SetLIghthouseCid] = useState('');
 								</button>
 							) : uploaded == false ? (
 								<button className="rounded-xl bg-green-600 button mt-3" onClick={listNFTForSale}>
-								  SELL MY ITEM 
+								  Create Ticket 
 							  </button>
 							) : (
 								<button style={{ cursor: "no-drop" }} className="button">
