@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@heroicons/react": "v1",
+    "framer-motion": "^11.9.0",
+    "heroicons": "^2.1.5",
+    "lucide-react": "^0.447.0"
+  }
+}
