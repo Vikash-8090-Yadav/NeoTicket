@@ -8,7 +8,6 @@ import lighthouse from '@lighthouse-web3/sdk'
 import axios from 'axios'
 import { create as IPFSHTTPClient } from 'ipfs-http-client'
 import Image from "next/image"
-import basic from "../Component/v1.0.0/Cards/images/basic.jpg"
 import { marketplaceAddress } from '../config'
 import NFTMarketplace from '../abi/marketplace.json'
 
@@ -189,15 +188,18 @@ export default function CreateItem() {
     <div className="min-h-screen py-10 bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
       <div className="container mx-auto mt-10">
         <div className="w-11/12 md:w-8/12 bg-white flex flex-col md:flex-row rounded-xl mx-auto shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
-          <div className="md:w-1/2 bg-black flex flex-col justify-center items-center p-6">
-            <div className="relative w-full h-64">
-              <Image 
-                src={basic} 
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md transition-transform duration-300 hover:scale-105" 
-                alt="Event Image" 
-              />
+          <div className="md:w-1/2 relative">
+            <Image 
+              src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80"
+              layout="fill"
+              objectFit="cover"
+              className="transition-transform duration-300 hover:scale-105" 
+              alt="Event Ticket NFT" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-500 opacity-75"></div>
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-white p-8">
+              <h3 className="text-3xl font-bold mb-4">NFT Ticketing</h3>
+              <p className="text-lg text-center">Create and manage event tickets as unique digital assets on the blockchain.</p>
             </div>
           </div>
           <div className="md:w-1/2 py-10 px-12 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
