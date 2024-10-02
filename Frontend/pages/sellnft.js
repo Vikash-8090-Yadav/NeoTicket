@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import { ToastContainer, toast } from 'react-toastify'
@@ -36,17 +36,17 @@ export default function CreateItem() {
   const [fileUrl, setFileUrl] = useState(null)
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' })
   const [loadingState, setLoadingState] = useState('not-loaded')
+  const [isCreating, setIsCreating] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     setLoadingState('loaded')
   }, [])
 
-  async function onChange(e) {
+  const onChange = useCallback(async (e) => {
     e.preventDefault()
     const file = e.target.files[0]
     try {
-      setLoadingState('loading')
       const selectedFile = e.target.files ? file : null
       setFile(selectedFile)
       setUploadLink("")
@@ -57,28 +57,27 @@ export default function CreateItem() {
       const url = `https://gateway.lighthouse.storage/ipfs/${cid1}`
       setFileUrl(url)
       console.log(url)
-      setLoadingState('loaded')
     } catch (error) {
       console.log('Error uploading file: ', error)
-      setLoadingState('loaded')
     }
-  }
+  }, [])
 
-  async function uploadToIPFS() {
+  const uploadToIPFS = useCallback(async () => {
     setuploading(true)
-    setLoadingState('loading')
     const { name, description, price } = formInput
 
     if (!name) {
       toast.warn("Asset Name field is empty")
+      return null
     } else if (description == "") {
       toast.warn("Asset description field is empty")
+      return null
     } else if (price == "") {
       toast.warn("Price field is empty")
-    } else if (uploaded == false) {
+      return null
+    } else if (!fileUrl) {
       toast.warn("Files upload required")
-    } else if (uploaded == false) {
-      toast.warn("Files upload required")
+      return null
     }
 
     console.log("Done")
@@ -111,22 +110,26 @@ export default function CreateItem() {
     } catch (error) {
       toast.warn("Error uploading image")
       console.log('Error uploading file: ', error)
+      return null
     } finally {
       setuploading(false)
       setuploaded(true)
-      setLoadingState('loaded')
-      toast.success("Files uploaded successfully")
     }
-  }
+  }, [formInput, fileUrl])
 
-  async function listNFTForSale(e) {
+  const listNFTForSale = useCallback(async (e) => {
     e.preventDefault()
-    setLoadingState('loading')
-
-    toast.success("Proposal Uploaded to LightHouse")
+    setIsCreating(true)
 
     try {
       const url = await uploadToIPFS()
+      if (!url) {
+        setIsCreating(false)
+        return
+      }
+
+      toast.success("Proposal Uploaded to LightHouse")
+
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       await provider.send('eth_requestAccounts', [])
       const signer = provider.getSigner()
@@ -165,17 +168,16 @@ export default function CreateItem() {
       let transaction = await contract.createToken(url, price, { value: listingPrice })
       await transaction.wait()
       
-      alert('Successfully created NFT')
-      toast.success("Files uploaded successfully")
+      toast.success("NFT created successfully")
     } catch (error) {
       console.error("Error listing NFT for sale:", error)
       toast.error("Error listing NFT for sale")
     } finally {
-      setLoadingState('loaded')
+      setIsCreating(false)
     }
-  }
+  }, [formInput, uploadToIPFS])
 
-  if (loadingState === 'not-loaded' || loadingState === 'loading') {
+  if (loadingState === 'not-loaded') {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
@@ -188,7 +190,15 @@ export default function CreateItem() {
       <div className="container mx-auto mt-10">
         <div className="w-11/12 md:w-8/12 bg-white flex flex-col md:flex-row rounded-xl mx-auto shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
           <div className="md:w-1/2 bg-black flex flex-col justify-center items-center p-6">
-            <Image src={basic} className="w-full rounded-md transition-transform duration-300 hover:scale-105" alt="Event Image" />
+            <div className="relative w-full h-64">
+              <Image 
+                src={basic} 
+                layout="fill"
+                objectFit="cover"
+                className="rounded-md transition-transform duration-300 hover:scale-105" 
+                alt="Event Image" 
+              />
+            </div>
           </div>
           <div className="md:w-1/2 py-10 px-12 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
             <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-600">List Your Event</h2>
@@ -238,12 +248,13 @@ export default function CreateItem() {
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
-                disabled={Uploading || uploaded}
+                disabled={isCreating}
               >
-                {Uploading ? (
-                  <TailSpin color="#fff" height={24} width={24} />
-                ) : uploaded ? (
-                  "Files Uploaded Successfully"
+                {isCreating ? (
+                  <div className="flex items-center justify-center">
+                    <TailSpin color="#fff" height={24} width={24} />
+                    <span className="ml-2">Creating Ticket...</span>
+                  </div>
                 ) : (
                   "Create Ticket"
                 )}
