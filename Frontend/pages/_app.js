@@ -239,7 +239,7 @@ function MyApp({ Component, pageProps = {} }) {
         {loading ? (
           <div className = "w-screen h-screen flex flex-col justify-center items-center">
             <ColorRing height = {90}/>
-            <div className = "font-semibold text-4xl tracking-widest px-5 text-center">TARA STORE</div>
+            <div className = "font-semibold text-4xl tracking-widest px-5 text-center">One Ticket</div>
           </div>
 
           ) : (

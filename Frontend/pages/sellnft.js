@@ -1,22 +1,23 @@
-import { useState } from 'react';
-import { ethers } from 'ethers';
-import { useRouter } from 'next/router';
-import { ToastContainer, toast } from 'react-toastify';
-import { TailSpin } from "react-loader-spinner";
-import Navbar from "../Component/Course/Nav";
+import { useState } from 'react'
+import { ethers } from 'ethers'
+import { useRouter } from 'next/router'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { TailSpin } from "react-loader-spinner"
+import Navbar from "../Component/Course/Nav"
 import lighthouse from '@lighthouse-web3/sdk'
-import axios from 'axios';
-import { upload } from "@spheron/browser-upload";
-import { notification } from 'antd';
-import { create as IPFSHTTPClient } from 'ipfs-http-client';
-import Image from "next/image";
+import axios from 'axios'
+import { upload } from "@spheron/browser-upload"
+import { notification } from 'antd'
+import { create as IPFSHTTPClient } from 'ipfs-http-client'
+import Image from "next/image"
 import basic from "../Component/v1.0.0/Cards/images/basic.jpg"
-const projectId = '2EFZSrxXvWgXDpOsDrr4cQosKcl';
-const ProjectSecret = 'b84c6cb2eec9c4536a0b6424ca709f9d';
+import { marketplaceAddress } from '../config'
+import NFTMarketplace from '../abi/marketplace.json'
 
-const auth =
-  'Basic ' + Buffer.from(projectId + ':' + ProjectSecret).toString('base64');
-
+const projectId = '2EFZSrxXvWgXDpOsDrr4cQosKcl'
+const ProjectSecret = 'b84c6cb2eec9c4536a0b6424ca709f9d'
+const auth = 'Basic ' + Buffer.from(projectId + ':' + ProjectSecret).toString('base64')
 const client = IPFSHTTPClient({
   host: 'ipfs.infura.io',
   port: 5001,
@@ -24,175 +25,117 @@ const client = IPFSHTTPClient({
   headers: {
     authorization: auth,
   },
-});
+})
 
-let cid1 = null;
-
-const apiKey = "b3b18111.271ba6addd39409a80ac3fee4d78070c" 
-
-
-import { marketplaceAddress } from '../config';
-import NFTMarketplace from '../abi/marketplace.json'
+const apiKey = "b3b18111.271ba6addd39409a80ac3fee4d78070c"
 
 export default function CreateItem() {
-// 
-// for the sdk
-
-const [uploadLink, setUploadLink] = useState("");
-const [dynamicLink, setDynamicLink] = useState("");
-const [file, setFile] = useState(null);
-const [LIghthouseCid,SetLIghthouseCid] = useState('');
-
-  // 
-  const [Uploading, setuploading] = useState(false);
-	const [uploaded, setuploaded] = useState(false);
-  const [fileUrl, setFileUrl] = useState(null);
-  const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' });
-  const router = useRouter();
+  const [uploadLink, setUploadLink] = useState("")
+  const [dynamicLink, setDynamicLink] = useState("")
+  const [file, setFile] = useState(null)
+  const [LIghthouseCid, SetLIghthouseCid] = useState('')
+  const [Uploading, setuploading] = useState(false)
+  const [uploaded, setuploaded] = useState(false)
+  const [fileUrl, setFileUrl] = useState(null)
+  const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' })
+  const router = useRouter()
 
   async function onChange(e) {
-    e.preventDefault();
-    const file = e.target.files[0];
+    e.preventDefault()
+    const file = e.target.files[0]
     try {
-
-    const selectedFile = e.target.files ? file : null;
-    setFile(selectedFile);
-    setUploadLink("");
-    setDynamicLink("");
+      const selectedFile = e.target.files ? file : null
+      setFile(selectedFile)
+      setUploadLink("")
+      setDynamicLink("")
       
-
-
-
-
-    
       const LightHouseresponse = await lighthouse.uploadText(file, apiKey, "Uploaded Image")
-
-      const cid1 = LightHouseresponse.data.Hash;
-      const url = `https://gateway.lighthouse.storage/ipfs/${cid1}`;
-      setFileUrl(url);
-      console.log(url);
+      const cid1 = LightHouseresponse.data.Hash
+      const url = `https://gateway.lighthouse.storage/ipfs/${cid1}`
+      setFileUrl(url)
+      console.log(url)
     } catch (error) {
-      console.log('Error uploading file: ', error);
+      console.log('Error uploading file: ', error)
     }
-
-    
-
   }
 
   async function uploadToIPFS() {
-		setuploading(true);
-    const { name, description, price } = formInput;
+    setuploading(true)
+    const { name, description, price } = formInput
 
-
-    if( !name){
-      toast.warn("Asset Name filed is empty");
-    }
-    else if(description == ""){
-      toast.warn("Asset description filed is empty");
-    }
-    else if(price== ""){
-      toast.warn("Price filed is empty");
-    }
-    else if(uploaded == false){
-      toast.warn("Files upload required");
-    }
-    else if(uploaded == false){
-      toast.warn("Files upload required");
+    if (!name) {
+      toast.warn("Asset Name field is empty")
+    } else if (description == "") {
+      toast.warn("Asset description field is empty")
+    } else if (price == "") {
+      toast.warn("Price field is empty")
+    } else if (uploaded == false) {
+      toast.warn("Files upload required")
+    } else if (uploaded == false) {
+      toast.warn("Files upload required")
     }
 
-  
-    // if (!name || !description || !price || !fileUrl) {
-    //   console.log("Error");
-    //   return;
-    // }
-
-    console.log("Done");
- 
-    /* first, upload to IPFS */
+    console.log("Done")
     
     const data = JSON.stringify({
       name,
       description,
       image: fileUrl,
-    });
+    })
 
     try {
-
-     
-
       const LightHouseresponse = await lighthouse.uploadText(data, apiKey, "Uploaded Image")
-
-      const cid1 = LightHouseresponse.data.Hash;
+      const cid1 = LightHouseresponse.data.Hash
 
       const datawithcid = JSON.stringify({
         name,
         description,
         image: fileUrl,
         cid1,
-      });
+      })
 
       const LightHouseresponse1 = await lighthouse.uploadText(datawithcid, apiKey, "Uploaded Image")
-
-      const cid2 = LightHouseresponse1.data.Hash;
-
+      const cid2 = LightHouseresponse1.data.Hash
       SetLIghthouseCid(cid2)
-
-
     
-      const LightHouseurl =  `https://gateway.lighthouse.storage/ipfs/${cid2}`;
-      // /* after file is uploaded to IPFS, return the URL to use it in the transaction */
- 
-      // console.log("upres",uploadResult)
-      // console.log("dynLInk",DynamicLink)
-
-      console.log("The url fro the lighthiuse is",LightHouseurl)
+      const LightHouseurl =  `https://gateway.lighthouse.storage/ipfs/${cid2}`
+      console.log("The url from the lighthouse is", LightHouseurl)
       
-      return LightHouseurl;
+      return LightHouseurl
     } catch (error) {
-      toast.warn("Error uploading image");
-      console.log('Error uploading file: ', error);
+      toast.warn("Error uploading image")
+      console.log('Error uploading file: ', error)
     }
   
-    setuploading(false);
-		setuploaded(true);
-		 
-		toast.success("Files uploaded sucessfully");
-
+    setuploading(false)
+    setuploaded(true)
+    toast.success("Files uploaded successfully")
   }
 
-
-
-
-
-
   async function listNFTForSale(e) {
-    e.preventDefault();
-
+    e.preventDefault()
 
     toast.success("Proposal Uploaded to LightHouse")
 
+    const url = await uploadToIPFS()
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    await provider.send('eth_requestAccounts', [])
+    const signer = provider.getSigner()
 
-    const url = await uploadToIPFS();
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send('eth_requestAccounts', []);
-    const signer = provider.getSigner();
-
-    /* next, create the item */
-    const price = ethers.utils.parseUnits(formInput.price, 'ether');
+    const price = ethers.utils.parseUnits(formInput.price, 'ether')
     let contract = new ethers.Contract(
       marketplaceAddress,
       NFTMarketplace.abi,
       signer
-    );
+    )
 
-    const desc = formInput.description;
-    const  name = formInput.name;
-    const price1 = formInput.price;
+    const desc = formInput.description
+    const name = formInput.name
+    const price1 = formInput.price
 
     const data = JSON.stringify({
-
-     name,price,desc
-    });
+      name, price, desc
+    })
     const dealParams = {
       num_copies: 1,
       repair_threshold: 28800,
@@ -200,96 +143,94 @@ const [LIghthouseCid,SetLIghthouseCid] = useState('');
       miner: ["t017840"],
       network: 'calibration',
       add_mock_data: 2
-    };
+    }
 
     const response = await lighthouse.uploadText(data, apiKey, "Data for the sale")
+    console.log("The cid is ", response.data.Hash)
 
-    console.log("The cid is ",response.data.Hash);
-
-  
-
-    const cid = response.data.Hash;
-    localStorage.setItem("cid11",cid)
-
+    const cid = response.data.Hash
+    localStorage.setItem("cid11", cid)
     
-    let listingPrice = await contract.getListingPrice();
-    listingPrice = listingPrice.toString();
-    let transaction = await contract.createToken(url, price, { value: listingPrice });
-    await transaction.wait();
+    let listingPrice = await contract.getListingPrice()
+    listingPrice = listingPrice.toString()
+    let transaction = await contract.createToken(url, price, { value: listingPrice })
+    await transaction.wait()
     
-
-    alert('Successfully created NFT');
-    toast.success("Files uploaded sucessfully");
-   
+    alert('Successfully created NFT')
+    toast.success("Files uploaded successfully")
   }
 
   return (
-    <>
-    <Navbar/>
-      <div className="min-h-screen py-10 bg-gradient-to-r from-gray-700 to-gray-300">
-      
-        <div className="container mx-auto mt-3">
-          <div className="flex w-8/12 bg-white flex-col md:flex-row rounded-xl mx-auto shadow-lg overflow-hidden">
-          <div className="md:w-1/2 bg-black flex flex-col justify-center items-center">
+    <div className="min-h-screen py-10 bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
 
-          <Image src = {basic} className = "w-full rounded-t-md duration-200 hover:scale-110 hover:overflow-hidden" />
+      <div className="container mx-auto mt-10">
+        <div className="w-11/12 md:w-8/12 bg-white flex flex-col md:flex-row rounded-xl mx-auto shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
+          <div className="md:w-1/2 bg-black flex flex-col justify-center items-center p-6">
+            <Image src={basic} className="w-full rounded-md transition-transform duration-300 hover:scale-105" alt="Event Image" />
           </div>
-          <div className="md:w-1/2 py-10 px-12">
-            <p className="mb-3">List your event</p>
-            <form>
-              <div className="mt-5">
-                <input placeholder="Event Name" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, name: e.target.value })}/>
+          <div className="md:w-1/2 py-10 px-12 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+            <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-600">List Your Event</h2>
+            <form onSubmit={listNFTForSale}>
+              <div className="mb-6">
+                <input 
+                  placeholder="Event Name" 
+                  className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" 
+                  onChange={(e) => updateFormInput({ ...formInput, name: e.target.value })}
+                />
               </div>
-
-              <div className="mt-5">
-                <textarea placeholder="Event Description" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, description: e.target.value })}/>  
+              <div className="mb-6">
+                <textarea 
+                  placeholder="Event Description" 
+                  className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" 
+                  rows="4"
+                  onChange={(e) => updateFormInput({ ...formInput, description: e.target.value })}
+                />
               </div>
-              
-              <div className="mt-5">
-                <input placeholder="Event Price in ETH" className="border-2 border-black rounded p-4 mb-2 w-full" onChange={(e) => updateFormInput({ ...formInput, price: e.target.value })}/>  
+              <div className="mb-6">
+                <input 
+                  placeholder="Event Price in ETH" 
+                  className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" 
+                  onChange={(e) => updateFormInput({ ...formInput, price: e.target.value })}
+                />
               </div>
-              
-              <div className="mt-5">
-							  <label className="block text-sm font-medium text-gray-700 name1">
-								  Select event Image
-							  </label>
-							  <div className="mt-1 flex items-center border-2 border-black">
-								  <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-									  
-                    <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                    
-										  <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-									  </svg>
-								  </span>
-                  
-                  <input type="file" name="Asset" className="ml-3 blockw-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:green-700 focus:outline-non "accept="image/*" onChange={onChange}/>
-                        
-								  {" "}
-							  </div>
-						  </div>
-						
-              {Uploading == true ? (
-								<button className="button bg-green-600">
-									<TailSpin color="#fff" height={20} />
-								</button>
-							) : uploaded == false ? (
-								<button className="rounded-xl bg-green-600 button mt-3" onClick={listNFTForSale}>
-								  Create Ticket 
-							  </button>
-							) : (
-								<button style={{ cursor: "no-drop" }} className="button">
-									Files uploaded sucessfully
-								</button>
-							)}
-              
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Select Event Image</label>
+                <div className="flex items-center">
+                  <input 
+                    type="file" 
+                    name="Asset" 
+                    className="hidden" 
+                    id="file-upload"
+                    accept="image/*" 
+                    onChange={onChange}
+                  />
+                  <label 
+                    htmlFor="file-upload" 
+                    className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"
+                  >
+                    Choose File
+                  </label>
+                  <span className="ml-3 text-sm">{file ? file.name : "No file chosen"}</span>
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
+                disabled={Uploading || uploaded}
+              >
+                {Uploading ? (
+                  <TailSpin color="#fff" height={24} width={24} />
+                ) : uploaded ? (
+                  "Files Uploaded Successfully"
+                ) : (
+                  "Create Ticket"
+                )}
+              </button>
             </form>
-            
-          </div>
           </div>
         </div>
       </div>
-    
- 
-    </>
-  );
+      <ToastContainer position="bottom-right" autoClose={5000} />
+    </div>
+  )
 }

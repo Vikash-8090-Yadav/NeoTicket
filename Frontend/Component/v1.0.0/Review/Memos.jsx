@@ -1,99 +1,52 @@
-
-import { useState, useEffect } from "react";
-
-import { notification } from 'antd';
-import Navbar from "../../Course/Nav";
-
-
+import { useState, useEffect } from "react"
 
 
 const Memos = ({ state }) => {
-  const [tokens, setTokens] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
-
-  const [memos, setMemos] = useState([]);
-  const { contract } = state;
+  const [memos, setMemos] = useState([])
+  const { contract } = state
 
   useEffect(() => {
     const memosMessage = async () => {
-      const memos = await contract.getMemos();
-      setMemos(memos);
-    };
-    contract && memosMessage();
-  }, [contract]);
+      if (contract) {
+        const memos = await contract.getMemos()
+        setMemos(memos)
+      }
+    }
+    memosMessage()
+  }, [contract])
 
   return (
-    <>
-        <p style={{ textAlign: "center", marginTop: "20px" }}>Messages</p>
-      {memos.map((memo) => {
-        return (
-          <div
-            className="container-fluid"
-            style={{ width: "100%" }}
-            key={Math.random()}
-          >
-            <table
-              style={{
-                marginBottom: "10px",
-              }}
-            >
-              <tbody>
+    <div className=" bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900  px-4 sm:px-6 lg:px-8">
+    
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl font-extrabold text-center text-white ">Messages</h2>
+        <div className="bg-white bg-opacity-10 overflow-hidden shadow-xl sm:rounded-lg">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 bg-opacity-10">
                 <tr>
-                  <td
-                    style={{
-                      backgroundColor: "#96D4D4",
-                      border: "1px solid white",
-                      borderCollapse: "collapse",
-                      padding: "7px",
-                      width: "100px",
-                    }}
-                  >
-                    {memo.name}
-                  </td>
-                  <td
-                    style={{
-                      backgroundColor: "#96D4D4",
-                      border: "1px solid white",
-                      borderCollapse: "collapse",
-                      padding: "7px",
-                      width: "800px",
-                    }}
-                  >
-                    {new Date(memo.timestamp * 1000).toLocaleString()}
-                  </td>
-                  <td
-                    style={{
-                      backgroundColor: "#96D4D4",
-                      border: "1px solid white",
-                      borderCollapse: "collapse",
-                      padding: "7px",
-                      width: "300px",
-                    }}
-                  >
-                    {memo.message}
-                  </td>
-                  <td
-                    style={{
-                      backgroundColor: "#96D4D4",
-                      border: "1px solid white",
-                      borderCollapse: "collapse",
-                      padding: "7px",
-                      width: "400px",
-                    }}
-                  >
-                    {memo.from}
-                  </td>
-                  
-                  
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Name</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Timestamp</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">Message</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">From</th>
                 </tr>
+              </thead>
+              <tbody className="bg-white bg-opacity-5 divide-y divide-gray-200">
+                {memos.map((memo, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50 bg-opacity-5' : ''}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">{memo.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{new Date(memo.timestamp * 1000).toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{memo.message}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{memo.from}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-        );
-      })}
-      </>
-  );
-};
+        </div>
+      </div>
+    </div>
+  )
+}
 
-export default Memos;
-
+export default Memos
