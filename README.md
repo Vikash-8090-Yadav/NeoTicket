@@ -43,8 +43,7 @@ https://xt4scan.ngd.network/address/0xcFC29195eb33f4e7dE75a0eB0ab6fB120946A3B2
 
 - Any  owner can create the ticket for their event
 
-![Screenshot from 2024-10-03 04-32-00](https://github.com/user-attachments/assets/20004dc4-da60-44ce-8b46-696a49e49f8d)
-
+![Screenshot from 2024-10-03 04-46-16](https://github.com/user-attachments/assets/6975ef4f-5f94-4712-ae73-53b9575567ec)
 
 ## Re sell 
 
