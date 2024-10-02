@@ -9,27 +9,34 @@ import NFTMarketplace from '../abi/marketplace.json'
 
 export default function ResellNFT() {
   const [formInput, updateFormInput] = useState({ price: '', image: '' })
+  const [loadingState, setLoadingState] = useState('not-loaded')
   const router = useRouter()
   const { id, tokenURI } = router.query
   const { image, price } = formInput
 
   useEffect(() => {
-    fetchNFT()
-  }, [id])
+    if (id && tokenURI) {
+      fetchNFT()
+    }
+  }, [id, tokenURI])
 
   async function fetchNFT() {
     if (!tokenURI) return
     try {
+      setLoadingState('loading')
       const meta = await axios.get(tokenURI)
       updateFormInput(state => ({ ...state, image: meta.data.image }))
+      setLoadingState('loaded')
     } catch (error) {
       console.error("Error fetching NFT metadata:", error)
+      setLoadingState('loaded')
     }
   }
 
   async function listNFTForSale() {
     if (!price) return
     try {
+      setLoadingState('loading')
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       await provider.send('eth_requestAccounts', [])
       const signer = provider.getSigner()
@@ -42,10 +49,20 @@ export default function ResellNFT() {
       let transaction = await contract.resellToken(id, priceFormatted, { value: listingPrice })
       await transaction.wait()
    
+      setLoadingState('loaded')
       router.push('/marketplace')
     } catch (error) {
       console.error("Error listing NFT for sale:", error)
+      setLoadingState('loaded')
     }
+  }
+
+  if (loadingState === 'not-loaded' || loadingState === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      </div>
+    )
   }
 
   return (
@@ -59,7 +76,7 @@ export default function ResellNFT() {
             <div className="p-8 w-full">
               <div className="mb-4">
                 <label htmlFor="price" className="block text-sm font-medium text-gray-300">
-                  Ticket Price in ETH
+                  New Ticket Price in GAS
                 </label>
                 <input
                   type="text"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import Link from 'next/link'
 import { ethers } from 'ethers'
-
+import {Web3} from 'web3';
 function NavLink({ to, children }) {
   return (
     <Link href={to}>
@@ -12,10 +12,32 @@ function NavLink({ to, children }) {
   )
 }
 
+const networks = {
+  NeoTestnet: {
+    chainId: `0x${Number(12227332).toString(16)}`,
+    chainName: "NeoTestnet",
+    nativeCurrency: {
+      name: "NeoTestnet",
+      symbol: "GAS",
+      decimals: 18,
+    },
+    rpcUrls: ["https://neoxt4seed1.ngd.network"],
+    blockExplorerUrls: ['https://xt4scan.ngd.network/'],
+
+  },
+};
+
+if (typeof window !== 'undefined') {
+  var accountAddress= localStorage.getItem("filWalletAddress");
+
+}
 export default function Navbar() {
   const [accountAddress, setAccountAddress] = useState('')
   const [isCopied, setIsCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [address , setAddress] = useState('');
+  const [balance , setBalance] = useState(' ');
 
   useEffect(() => {
     const storedAddress = localStorage.getItem("filWalletAddress")
@@ -25,21 +47,51 @@ export default function Navbar() {
   }, [])
 
   const handleLogin = async () => {
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        localStorage.setItem("filWalletAddress", address)
-        setAccountAddress(address)
-      } catch (error) {
-        console.error("Failed to connect wallet:", error)
-      }
-    } else {
-      alert("Please install MetaMask!")
-    }
+    setLoading(true);
+    
+    if(typeof window.ethereum =="undefined"){
+      console.log("PLease install the metamask");
   }
+  let web3 =  new Web3(window.ethereum);
+
+
+  // console.log( "The netwopr is",await web3.network)
+  const chainId = await web3.eth.getChainId();
+
+  const NeoTestnetChainId = parseInt(networks.NeoTestnet.chainId, 16);
+
+
+  console.log(parseInt(chainId));
+  console.log("The neo testnet chain id is",parseInt(chainId));
+
+
+  const chainId1 = parseInt(chainId);
+
+  
+ 
+  if(chainId1 !== NeoTestnetChainId){
+
+      await window.ethereum.request({
+          method:"wallet_addEthereumChain",
+          params:[{
+              ...networks["NeoTestnet"]
+          }]
+      })
+  }
+  const accounts = await web3.eth.requestAccounts();
+
+  console.log(accounts)
+  const Address =  accounts[0];
+  if (typeof window !== 'undefined') {
+  localStorage.setItem("filWalletAddress",Address)
+  }
+
+  console.log(Address)
+  setAddress(Address);
+
+    setLoading(false);
+    window.location.reload();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("filWalletAddress")

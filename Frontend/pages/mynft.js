@@ -55,6 +55,7 @@ export default function MyAssets() {
       setLoadingState('loaded')
     } catch (error) {
       console.error("Failed to load NFTs:", error)
+      setLoadingState('loaded') // Set to loaded even on error to remove loading spinner
     }
   }
 
@@ -63,10 +64,17 @@ export default function MyAssets() {
     router.push(`/resell-nft?id=${nft.tokenId}&tokenURI=${nft.tokenURI}`)
   }
 
+  if (loadingState === 'not-loaded') {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      </div>
+    )
+  }
+
   if (loadingState === 'loaded' && !nfts.length) {
     return (
       <div className="min-h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
-     
         <div className="flex items-center justify-center h-screen">
           <h1 className="text-3xl font-bold text-white">No Tickets Owned</h1>
         </div>
@@ -76,7 +84,6 @@ export default function MyAssets() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
-     
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-600">
           My Tickets
@@ -90,7 +97,7 @@ export default function MyAssets() {
               <div className="p-4">
                 <h3 className="text-xl font-semibold mb-2 text-gray-800 truncate">{nft.name}</h3>
                 <p className="text-gray-600 mb-4 h-12 overflow-hidden">{nft.description}</p>
-                <p className="text-2xl font-bold text-indigo-600 mb-4">{nft.price} ETH</p>
+                <p className="text-2xl font-bold text-indigo-600 mb-4">{nft.price} GAS</p>
                 <button
                   className="w-full bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1"
                   onClick={() => listNFT(nft)}

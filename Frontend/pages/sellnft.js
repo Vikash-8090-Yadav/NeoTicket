@@ -1,14 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { TailSpin } from "react-loader-spinner"
-import Navbar from "../Component/Course/Nav"
 import lighthouse from '@lighthouse-web3/sdk'
 import axios from 'axios'
-import { upload } from "@spheron/browser-upload"
-import { notification } from 'antd'
 import { create as IPFSHTTPClient } from 'ipfs-http-client'
 import Image from "next/image"
 import basic from "../Component/v1.0.0/Cards/images/basic.jpg"
@@ -38,12 +35,18 @@ export default function CreateItem() {
   const [uploaded, setuploaded] = useState(false)
   const [fileUrl, setFileUrl] = useState(null)
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' })
+  const [loadingState, setLoadingState] = useState('not-loaded')
   const router = useRouter()
+
+  useEffect(() => {
+    setLoadingState('loaded')
+  }, [])
 
   async function onChange(e) {
     e.preventDefault()
     const file = e.target.files[0]
     try {
+      setLoadingState('loading')
       const selectedFile = e.target.files ? file : null
       setFile(selectedFile)
       setUploadLink("")
@@ -54,13 +57,16 @@ export default function CreateItem() {
       const url = `https://gateway.lighthouse.storage/ipfs/${cid1}`
       setFileUrl(url)
       console.log(url)
+      setLoadingState('loaded')
     } catch (error) {
       console.log('Error uploading file: ', error)
+      setLoadingState('loaded')
     }
   }
 
   async function uploadToIPFS() {
     setuploading(true)
+    setLoadingState('loading')
     const { name, description, price } = formInput
 
     if (!name) {
@@ -105,64 +111,80 @@ export default function CreateItem() {
     } catch (error) {
       toast.warn("Error uploading image")
       console.log('Error uploading file: ', error)
+    } finally {
+      setuploading(false)
+      setuploaded(true)
+      setLoadingState('loaded')
+      toast.success("Files uploaded successfully")
     }
-  
-    setuploading(false)
-    setuploaded(true)
-    toast.success("Files uploaded successfully")
   }
 
   async function listNFTForSale(e) {
     e.preventDefault()
+    setLoadingState('loading')
 
     toast.success("Proposal Uploaded to LightHouse")
 
-    const url = await uploadToIPFS()
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    await provider.send('eth_requestAccounts', [])
-    const signer = provider.getSigner()
+    try {
+      const url = await uploadToIPFS()
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      await provider.send('eth_requestAccounts', [])
+      const signer = provider.getSigner()
 
-    const price = ethers.utils.parseUnits(formInput.price, 'ether')
-    let contract = new ethers.Contract(
-      marketplaceAddress,
-      NFTMarketplace.abi,
-      signer
-    )
+      const price = ethers.utils.parseUnits(formInput.price, 'ether')
+      let contract = new ethers.Contract(
+        marketplaceAddress,
+        NFTMarketplace.abi,
+        signer
+      )
 
-    const desc = formInput.description
-    const name = formInput.name
-    const price1 = formInput.price
+      const desc = formInput.description
+      const name = formInput.name
+      const price1 = formInput.price
 
-    const data = JSON.stringify({
-      name, price, desc
-    })
-    const dealParams = {
-      num_copies: 1,
-      repair_threshold: 28800,
-      renew_threshold: 240,
-      miner: ["t017840"],
-      network: 'calibration',
-      add_mock_data: 2
+      const data = JSON.stringify({
+        name, price, desc
+      })
+      const dealParams = {
+        num_copies: 1,
+        repair_threshold: 28800,
+        renew_threshold: 240,
+        miner: ["t017840"],
+        network: 'calibration',
+        add_mock_data: 2
+      }
+
+      const response = await lighthouse.uploadText(data, apiKey, "Data for the sale")
+      console.log("The cid is ", response.data.Hash)
+
+      const cid = response.data.Hash
+      localStorage.setItem("cid11", cid)
+      
+      let listingPrice = await contract.getListingPrice()
+      listingPrice = listingPrice.toString()
+      let transaction = await contract.createToken(url, price, { value: listingPrice })
+      await transaction.wait()
+      
+      alert('Successfully created NFT')
+      toast.success("Files uploaded successfully")
+    } catch (error) {
+      console.error("Error listing NFT for sale:", error)
+      toast.error("Error listing NFT for sale")
+    } finally {
+      setLoadingState('loaded')
     }
+  }
 
-    const response = await lighthouse.uploadText(data, apiKey, "Data for the sale")
-    console.log("The cid is ", response.data.Hash)
-
-    const cid = response.data.Hash
-    localStorage.setItem("cid11", cid)
-    
-    let listingPrice = await contract.getListingPrice()
-    listingPrice = listingPrice.toString()
-    let transaction = await contract.createToken(url, price, { value: listingPrice })
-    await transaction.wait()
-    
-    alert('Successfully created NFT')
-    toast.success("Files uploaded successfully")
+  if (loadingState === 'not-loaded' || loadingState === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen py-10 bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
-
       <div className="container mx-auto mt-10">
         <div className="w-11/12 md:w-8/12 bg-white flex flex-col md:flex-row rounded-xl mx-auto shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
           <div className="md:w-1/2 bg-black flex flex-col justify-center items-center p-6">
@@ -188,7 +210,7 @@ export default function CreateItem() {
               </div>
               <div className="mb-6">
                 <input 
-                  placeholder="Event Price in ETH" 
+                  placeholder="Event Price in GAS" 
                   className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" 
                   onChange={(e) => updateFormInput({ ...formInput, price: e.target.value })}
                 />
