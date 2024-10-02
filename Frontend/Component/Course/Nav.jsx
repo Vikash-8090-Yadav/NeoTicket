@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react"
 import Link from 'next/link'
 import { ethers } from 'ethers'
-import {Web3} from 'web3';
+import { Web3 } from 'web3'
+
 function NavLink({ to, children }) {
   return (
     <Link href={to}>
@@ -23,90 +24,87 @@ const networks = {
     },
     rpcUrls: ["https://neoxt4seed1.ngd.network"],
     blockExplorerUrls: ['https://xt4scan.ngd.network/'],
-
   },
-};
-
-if (typeof window !== 'undefined') {
-  var accountAddress= localStorage.getItem("filWalletAddress");
-
 }
+
 export default function Navbar() {
   const [accountAddress, setAccountAddress] = useState('')
-  const [isCopied, setIsCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [loading, setLoading] = useState(false);
-  const [address , setAddress] = useState('');
-  const [balance , setBalance] = useState(' ');
+  const [loading, setLoading] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [balance, setBalance] = useState('0')
+  const [isHovered, setIsHovered] = useState(false)
 
   useEffect(() => {
     const storedAddress = localStorage.getItem("filWalletAddress")
     if (storedAddress) {
       setAccountAddress(storedAddress)
+      fetchBalance(storedAddress)
     }
   }, [])
 
+  const fetchBalance = async (address) => {
+    if (typeof window.ethereum !== 'undefined') {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const balance = await provider.getBalance(address)
+      setBalance(ethers.utils.formatEther(balance))
+    }
+  }
+
   const handleLogin = async () => {
-    setLoading(true);
+    setLoading(true)
     
-    if(typeof window.ethereum =="undefined"){
-      console.log("PLease install the metamask");
-  }
-  let web3 =  new Web3(window.ethereum);
+    if(typeof window.ethereum == "undefined"){
+      console.log("Please install the metamask")
+    }
+    let web3 = new Web3(window.ethereum)
 
+    const chainId = await web3.eth.getChainId()
+    const NeoTestnetChainId = parseInt(networks.NeoTestnet.chainId, 16)
 
-  // console.log( "The netwopr is",await web3.network)
-  const chainId = await web3.eth.getChainId();
+    console.log(parseInt(chainId))
+    console.log("The neo testnet chain id is", parseInt(chainId))
 
-  const NeoTestnetChainId = parseInt(networks.NeoTestnet.chainId, 16);
-
-
-  console.log(parseInt(chainId));
-  console.log("The neo testnet chain id is",parseInt(chainId));
-
-
-  const chainId1 = parseInt(chainId);
-
-  
- 
-  if(chainId1 !== NeoTestnetChainId){
-
+    const chainId1 = parseInt(chainId)
+    
+    if(chainId1 !== NeoTestnetChainId){
       await window.ethereum.request({
-          method:"wallet_addEthereumChain",
-          params:[{
-              ...networks["NeoTestnet"]
-          }]
+        method: "wallet_addEthereumChain",
+        params: [{
+          ...networks["NeoTestnet"]
+        }]
       })
+    }
+    const accounts = await web3.eth.requestAccounts()
+
+    console.log(accounts)
+    const Address = accounts[0]
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("filWalletAddress", Address)
+    }
+
+    console.log(Address)
+    setAccountAddress(Address)
+    fetchBalance(Address)
+
+    setLoading(false)
+    window.location.reload()
   }
-  const accounts = await web3.eth.requestAccounts();
-
-  console.log(accounts)
-  const Address =  accounts[0];
-  if (typeof window !== 'undefined') {
-  localStorage.setItem("filWalletAddress",Address)
-  }
-
-  console.log(Address)
-  setAddress(Address);
-
-    setLoading(false);
-    window.location.reload();
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("filWalletAddress")
     setAccountAddress('')
-  }
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(accountAddress)
-    setIsCopied(true)
-    setTimeout(() => setIsCopied(false), 2000)
+    setIsDropdownOpen(false)
+    setBalance('0')
   }
 
   function truncateAddress(address) {
     if (!address) return ''
     return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
+  const getEtherscanLink = (address) => {
+    return `https://xt4scan.ngd.network/address/${address}`
   }
 
   return (
@@ -133,14 +131,60 @@ export default function Navbar() {
           </div>
           <div className="hidden lg:flex items-center space-x-6">
             {accountAddress ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-300 text-lg">{truncateAddress(accountAddress)}</span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white text-lg font-medium py-2 px-6 rounded-full transition duration-150 ease-in-out"
-                >
-                  Logout
-                </button>
+              <div className="flex items-center">
+                <span className="text-white text-lg mr-4">{truncateAddress(accountAddress)}</span>
+                <div className="relative">
+                  <button
+                    onMouseEnter={() => {
+                      setIsDropdownOpen(true)
+                      setIsHovered(true)
+                    }}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className={`w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-yellow-500 flex items-center justify-center text-white font-bold text-lg focus:outline-none overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${
+                      isHovered ? 'ring-2 ring-white' : ''
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </button>
+                  {isDropdownOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-64 bg-gradient-to-br from-purple-900 to-indigo-900 rounded-md shadow-lg py-1 z-10"
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      <div className="px-4 py-3 text-sm text-gray-200 border-b border-gray-700 flex justify-between items-center">
+                        <span className="font-medium">Account</span>
+                        <a 
+                          href={getEtherscanLink(accountAddress)} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
+                      <div className="px-4 py-3 text-sm text-gray-200 border-b border-gray-700">
+                        <p className="font-medium text-yellow-400">Address</p>
+                        <p className="truncate">{accountAddress}</p>
+                      </div>
+                      <div className="px-4 py-3 text-sm text-gray-200 border-b border-gray-700">
+                        <p className="font-medium text-yellow-400">Balance</p>
+                        <p>{parseFloat(balance).toFixed(4)} GAS</p>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-purple-800 transition duration-150 ease-in-out"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <button
@@ -183,8 +227,8 @@ export default function Navbar() {
           <div className="pt-4 pb-4 border-t border-gray-700">
             <div className="flex items-center px-5">
               {accountAddress ? (
-                <div className="flex flex-col space-y-2">
-                  <span className="text-gray-300 text-lg">{truncateAddress(accountAddress)}</span>
+                <div className="flex items-center space-x-4">
+                  <span className="text-white text-lg">{truncateAddress(accountAddress)}</span>
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 text-white text-lg font-medium py-2 px-6 rounded-full transition duration-150 ease-in-out"
