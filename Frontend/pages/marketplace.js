@@ -3,20 +3,19 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { marketplaceAddress } from '../config'
 import NFTMarketplace from '../abi/marketplace.json'
-import {Web3} from 'web3';
-
-
+import {Web3} from 'web3'
 
 export default function Home() {
   const [accountAddress, setAccountAddress] = useState('')
   const [isCopied, setIsCopied] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [loading, setLoading] = useState(false);
-  const [address , setAddress] = useState('');
-  const [balance , setBalance] = useState(' ');
+  const [loading, setLoading] = useState(false)
+  const [address , setAddress] = useState('')
+  const [balance , setBalance] = useState(' ')
   const [nfts, setNfts] = useState([])
   const [loadingState, setLoadingState] = useState('not-loaded')
   const [error, setError] = useState(null)
+  const [buyingNft, setBuyingNft] = useState(null)
 
   useEffect(() => {
     loadNFTs()
@@ -63,6 +62,7 @@ export default function Home() {
   }
 
   async function buyNft(nft) {
+    setBuyingNft(nft.tokenId)
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       await provider.send('eth_requestAccounts', [])
@@ -80,13 +80,16 @@ export default function Home() {
         value: price
       })
       await transaction.wait()
-      loadNFTs()
-      setError("NFT purchased successfully!")
+      await loadNFTs()
+      alert("NFT purchased successfully!")
     } catch (error) {
       console.error("Failed to buy NFT:", error)
       setError(error.message)
+    } finally {
+      setBuyingNft(null)
     }
   }
+
   const networks = {
     NeoTestnet: {
       chainId: `0x${Number(12227332).toString(16)}`,
@@ -98,57 +101,46 @@ export default function Home() {
       },
       rpcUrls: ["https://neoxt4seed1.ngd.network"],
       blockExplorerUrls: ['https://xt4scan.ngd.network/'],
-  
     },
-  };
+  }
 
   async function switchToNeoXTestnet() {
+    setLoading(true)
     
-      setLoading(true);
-      
-      if(typeof window.ethereum =="undefined"){
-        console.log("PLease install the metamask");
+    if(typeof window.ethereum =="undefined"){
+      console.log("PLease install the metamask")
     }
-    let web3 =  new Web3(window.ethereum);
-  
-  
-    // console.log( "The netwopr is",await web3.network)
-    const chainId = await web3.eth.getChainId();
-  
-    const NeoTestnetChainId = parseInt(networks.NeoTestnet.chainId, 16);
-  
-  
-    console.log(parseInt(chainId));
-    console.log("The neo testnet chain id is",parseInt(chainId));
-  
-  
-    const chainId1 = parseInt(chainId);
-  
-    
+    let web3 =  new Web3(window.ethereum)
+
+    const chainId = await web3.eth.getChainId()
+    const NeoTestnetChainId = parseInt(networks.NeoTestnet.chainId, 16)
+
+    console.log(parseInt(chainId))
+    console.log("The neo testnet chain id is",parseInt(chainId))
+
+    const chainId1 = parseInt(chainId)
    
     if(chainId1 !== NeoTestnetChainId){
-  
-        await window.ethereum.request({
-            method:"wallet_addEthereumChain",
-            params:[{
-                ...networks["NeoTestnet"]
-            }]
-        })
+      await window.ethereum.request({
+        method:"wallet_addEthereumChain",
+        params:[{
+          ...networks["NeoTestnet"]
+        }]
+      })
     }
-    const accounts = await web3.eth.requestAccounts();
-  
+    const accounts = await web3.eth.requestAccounts()
+
     console.log(accounts)
-    const Address =  accounts[0];
+    const Address =  accounts[0]
     if (typeof window !== 'undefined') {
-    localStorage.setItem("filWalletAddress",Address)
+      localStorage.setItem("filWalletAddress",Address)
     }
-  
+
     console.log(Address)
-    setAddress(Address);
-  
-      setLoading(false);
-      window.location.reload();
-    
+    setAddress(Address)
+
+    setLoading(false)
+    window.location.reload()
   }
 
   if (loadingState === 'not-loaded') {
@@ -163,7 +155,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-600">
-          NFT Marketplace
+          OneTicket Marketplace
         </h1>
         
         {error && (
@@ -200,12 +192,20 @@ export default function Home() {
                   <h2 className="text-xl font-semibold mb-2 text-gray-800">{nft.name}</h2>
                   <p className="text-gray-600 h-20 overflow-y-auto mb-4">{nft.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-indigo-600">{nft.price} ETH</span>
+                    <span className="text-2xl font-bold text-indigo-600">{nft.price} GAS</span>
                     <button 
                       onClick={() => buyNft(nft)}
-                      className="bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl"
+                      disabled={buyingNft === nft.tokenId}
+                      className={`bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl ${buyingNft === nft.tokenId ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      Buy NFT
+                      {buyingNft === nft.tokenId ? (
+                        <div className="flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+                          Buying...
+                        </div>
+                      ) : (
+                        'Buy Ticket'
+                      )}
                     </button>
                   </div>
                 </div>

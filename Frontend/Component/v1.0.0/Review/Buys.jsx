@@ -13,9 +13,11 @@ if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
 const Buy = ({ state }) => {
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const buyChai = async (event) => {
     event.preventDefault()
+    setIsSubmitting(true)
     const { contract } = state
 
     console.log(name, message, contract)
@@ -36,11 +38,13 @@ const Buy = ({ state }) => {
       setMessage("")
     } catch (error) {
       console.error("Error during transaction:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className=" bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gradient-to-r from-purple-900 via-blue-800 to-indigo-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto bg-white bg-opacity-10 rounded-xl shadow-md overflow-hidden md:max-w-2xl">
         <div className="md:flex">
           <div className="p-8 w-full">
@@ -59,6 +63,7 @@ const Buy = ({ state }) => {
                   placeholder="Enter Item name"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white bg-opacity-20 text-white"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <div>
@@ -73,15 +78,28 @@ const Buy = ({ state }) => {
                   placeholder="Enter your Review Message"
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white bg-opacity-20 text-white"
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               <div>
                 <button
                   type="submit"
-                  disabled={!state.contract}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"
+                  disabled={!state.contract || isSubmitting}
+                  className={`w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-pink-500 to-yellow-500 hover:from-pink-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 ${
+                    isSubmitting || !state.contract ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Complete Review
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Submitting Review...
+                    </>
+                  ) : (
+                    'Complete Review'
+                  )}
                 </button>
               </div>
             </form>
